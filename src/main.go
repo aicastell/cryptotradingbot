@@ -18,11 +18,12 @@ func main() {
 	for {
 		euros = bitstamp.DoGet("btceur")
 
-		ema_low.New_price(euros)
-		ema_low.Log()
-
-		ema_hig.New_price(euros)
-		ema_hig.Log()
+        if euros != 0.0 {
+    		ema_low.New_price(euros)
+    		ema_low.Log()
+    		ema_hig.New_price(euros)
+    		ema_hig.Log()
+        }
 
 		time.Sleep(60 * time.Second)
 	}

@@ -75,6 +75,11 @@ func DoGet(coinpair string) float64 {
 	// Defer the closing of the body
 	defer resp.Body.Close()
 
+    // Check not empty
+    if (bst.Last == "") {
+        return 0.0
+    }
+
 	last, err := strconv.ParseFloat(bst.Last, 64)
 	if err != nil {
 		log.Fatal("ParseFloat: ", err)
