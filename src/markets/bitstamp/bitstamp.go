@@ -24,8 +24,8 @@ type TBitstampTicker struct {
 
 // coinpair = btceur
 func DoGet(coinpair string) float64 {
+    // Build the URL
 	url := fmt.Sprintf("https://www.bitstamp.net/api/v2/ticker/%s/", coinpair)
-	fmt.Println(url)
 
 	// Build the request
 	req, err := http.NewRequest("GET", url, nil)
@@ -34,40 +34,26 @@ func DoGet(coinpair string) float64 {
 		return 0.0
 	}
 
-	// For control over HTTP client headers,
-	// redirect policy, and other settings,
-	// create a Client
-	// A Client is an HTTP client
+	// Build HTTP client
 	client := &http.Client{}
 
-	// Send the request via a client
-	// Do sends an HTTP request and
-	// returns an HTTP res ponse
+	// Do send an HTTP request and return an HTTP response
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Fatal("Do: ", err)
 		return 0.0
 	}
 
-	// Print response body
-	// bodybytes, _ := ioutil.ReadAll(resp.Body)
-	//bodystring := string(bodybytes)
-	//	fmt.Println(bodystring)
-	//fmt.Println("=======================================================")
-
-	// Fill the record with the data from the JSON
 	var bst TBitstampTicker
 
-	// var dat map[string]interface{}
-	// json.Unmarshal(bodybytes, &dat)
-
-	// Use json.Decode for reading streams of JSON data
+	// Build JSON decoder with resp.Body
 	decoder := json.NewDecoder(resp.Body)
 
+	// Fill the record with JSON data
 	err = decoder.Decode(&bst)
 	if err != nil {
 		log.Println(err)
-		fmt.Println("===========")
+        return 0.0
 	}
 
 	// Callers should close resp.Body
