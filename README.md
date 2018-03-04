@@ -20,13 +20,13 @@ Where:
 The strategy01 uses two EMA functions (n=13 and n=34) with an interval of 15
 minutes between t and (t-1):
 
-    * When EMA_13 > EMA_34 its a climbing price
-    * When EMA_13 < EMA_34 its a falling price
+    * EMA_13 > EMA_34 ==> climbing price
+    * EMA_13 < EMA_34 ==> falling price
 
-The strategy consist of:
+The strategy01 consist of:
 
-    * Buy when:  EMA_13(t) < EMA_34(t) and EMA13(t+1) > EMA34(t+1)
-    * Sell when: EMA_13(t) > EMA_34(t) and EMA13(t+1) < EMA34(t+1)
+    * Buy when  (EMA_13(t) < EMA_34(t)) AND (EMA13(t+1) > EMA34(t+1))
+    * Sell when (EMA_13(t) > EMA_34(t)) AND (EMA13(t+1) < EMA34(t+1))
 
 You should play with tradingview.com to see the behaviour of this setup.
 
