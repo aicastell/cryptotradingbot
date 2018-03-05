@@ -47,7 +47,7 @@ func DoGet(coinpair string) (float64, error) {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
         fmt.Println("ERROR1")
-		log.Fatal("NewRequest: ", err)
+		// log.Fatal("NewRequest: ", err)
         return -1, &MyError{13}
 	}
 
@@ -58,7 +58,7 @@ func DoGet(coinpair string) (float64, error) {
 	resp, err := client.Do(req)
 	if err != nil {
         fmt.Println("ERROR2")
-		log.Fatal("Do: ", err)
+		// log.Fatal("Do: ", err)
         return -1, &MyError{13}
 	}
 
@@ -89,7 +89,7 @@ func DoGet(coinpair string) (float64, error) {
 	price, err := strconv.ParseFloat(bst.Last, 64)
 	if err != nil {
         fmt.Println("ERROR5")
-		log.Fatal("ParseFloat: ", err)
+		// log.Fatal("ParseFloat: ", err)
         return -1, &MyError{13}
 	}
 
