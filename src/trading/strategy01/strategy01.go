@@ -12,36 +12,39 @@ var UNDEF = int32(-1)
 var TRUE  = int32(1)
 var FALSE = int32(0)
 
-func Start(pair string, period time.Duration, training_iters int, win_len_min int, win_len_max int) {
+func Start(buycoin string, sellcoin string, invest float64, period time.Duration, training_iters int, win_len_min int, win_len_max int) {
 
     var ema_fast ema.TFinantial_EMA
     var ema_slow ema.TFinantial_EMA
     var ema_vol  ema.TFinantial_EMA
-    var market generic.TMarket
 
     ema_fast.Reset(win_len_min)
     ema_slow.Reset(win_len_max)
     ema_vol.Reset(10)
-    market.Reset("bitcoin", "euro", 1000)
+
+    var market generic.TMarket
+
+    market.Reset(buycoin, sellcoin, invest)
 
     var fast_gt_slow = int32(UNDEF)
 
 	iter := 0
+    pair := buycoin + sellcoin // btceur
+
+    fmt.Println(pair)
 
     for {
-        fmt.Println("Iter")
+        time.Sleep(period * time.Second)
+
         price, err := bitstamp.DoGet(pair)
         if (err != nil) {
             fmt.Println("Error en el doget de bitstamp")
-            time.Sleep(period * time.Second)
             continue
         }
 
         ema_fast.New_price(price)
         ema_slow.New_price(price)
         fmt.Println("price: ", price, "ema_fast: ", ema_fast.Ema(), "ema_slow: ", ema_slow.Ema(), "time: ", time.Now())
-
-        time.Sleep(period * time.Second)
 
 		if (iter < training_iters) {
 		    iter++;
@@ -78,12 +81,12 @@ func Start(pair string, period time.Duration, training_iters int, win_len_min in
         if (fast_gt_slow == FALSE) {
             if (ema_fast.Ema() < ema_slow.Ema()) {
                 fmt.Println("ema_fast < ema_slow... Se mantiene la tendencia de bajada")
-                // tendency is maintained (BAJADA)
+                // tendency is maintained (falling price)
                 continue
             } else {
                 if (market.InsideMarket() == false) {
                     market.DoBuy(price)
-                    fmt.Println("********************************** COMPRA a: ", market.LastBuyPrice())
+                    fmt.Println("********************************** Buy at: ", market.LastBuyPrice())
                     fmt.Println("********************************** CRYPTO: ", market.Crypto())
                 } else {
                     fmt.Println("===> Tocaba comprar pero ya estoy dentro")
@@ -93,12 +96,12 @@ func Start(pair string, period time.Duration, training_iters int, win_len_min in
         } else {
             if (ema_fast.Ema() > ema_slow.Ema()) {
                 fmt.Println("ema_fast > ema_slow... Se mantiene la tendencia de subida")
-                // tendency is maintained (SUBIDA)
+                // tendency is maintained (climbing price)
                 continue
             } else {
                 if (market.InsideMarket() == true) {
                     market.DoSell(price)
-                    fmt.Println("********************************** VENDE a: ", market.LastSellPrice())
+                    fmt.Println("********************************** Sell at: ", market.LastSellPrice())
                     fmt.Println("********************************** FIAT: ", market.Fiat())
                 } else {
                     fmt.Println("===> Tocaba vender pero estoy fuera")
