@@ -20,18 +20,17 @@ func (ob *TFinantial_EMA) Log () {
 }
 
 func (ob *TFinantial_EMA) Reset (win_len int) {
-
     ob.win_len = win_len
     ob.k = (2.0 / (float64(win_len) + 1.0))
     ob.ema_ant = 0.0
     ob.ema_cur = 0.0
 }
 
-func (ob *TFinantial_EMA) Window_len () int {
+func (ob *TFinantial_EMA) WindowLen () int {
     return ob.win_len
 }
 
-func (ob *TFinantial_EMA) Set_window_len (win_len int) {
+func (ob *TFinantial_EMA) SetWindowLen (win_len int) {
     ob.win_len = win_len
 }
 

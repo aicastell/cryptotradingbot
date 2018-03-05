@@ -8,7 +8,15 @@ import (
 	"strconv"
 )
 
-// {"high": "2559.98", "last": "2559.25", "timestamp": "1497016409", "bid": "2555.00", "vwap": "2492.13", "volume": "1650.07586432", "low": "2423.51", "ask": "2559.25", "open": "2519.00"}
+// {"high": "2559.98",
+//  "last": "2559.25",
+//  "timestamp": "1497016409",
+//  "bid": "2555.00",
+//  "vwap": "2492.13",
+//  "volume": "1650.07586432",
+//  "low": "2423.51",
+//  "ask": "2559.25",
+//  "open": "2519.00"}
 
 type TBitstampTicker struct {
 	High      string `json:"high"`
@@ -22,16 +30,25 @@ type TBitstampTicker struct {
 	Open      string `json:"open"`
 }
 
+type MyError struct {
+    errcode int
+}
+
+func (e *MyError) Error() string {
+    return fmt.Sprintf("Error code: %d", e.errcode)
+}
+
 // coinpair = btceur
-func DoGet(coinpair string) float64 {
+func DoGet(coinpair string) (float64, error) {
     // Build the URL
 	url := fmt.Sprintf("https://www.bitstamp.net/api/v2/ticker/%s/", coinpair)
 
 	// Build the request
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
+        fmt.Println("ERROR1")
 		log.Fatal("NewRequest: ", err)
-		return 0.0
+        return -1, &MyError{13}
 	}
 
 	// Build HTTP client
@@ -40,8 +57,9 @@ func DoGet(coinpair string) float64 {
 	// Do send an HTTP request and return an HTTP response
 	resp, err := client.Do(req)
 	if err != nil {
+        fmt.Println("ERROR2")
 		log.Fatal("Do: ", err)
-		return 0.0
+        return -1, &MyError{13}
 	}
 
 	var bst TBitstampTicker
@@ -52,8 +70,9 @@ func DoGet(coinpair string) float64 {
 	// Fill the record with JSON data
 	err = decoder.Decode(&bst)
 	if err != nil {
+        fmt.Println("ERROR3")
 		log.Println(err)
-        return 0.0
+        return -1, &MyError{13}
 	}
 
 	// Callers should close resp.Body
@@ -63,14 +82,23 @@ func DoGet(coinpair string) float64 {
 
     // Check not empty
     if (bst.Last == "") {
-        return 0.0
+        fmt.Println("ERROR4")
+        return -1, &MyError{13}
     }
 
-	last, err := strconv.ParseFloat(bst.Last, 64)
+	price, err := strconv.ParseFloat(bst.Last, 64)
 	if err != nil {
+        fmt.Println("ERROR5")
 		log.Fatal("ParseFloat: ", err)
-		return 0.0
+        return -1, &MyError{13}
 	}
 
-	return last
+        /*
+    volume, err := strconv.ParseFloat(bst.Volume, 64)
+	if err != nil {
+		log.Fatal("ParseFloat: ", err)
+        return -1, &MyError{13}
+	}*/
+
+	return price, nil
 }
