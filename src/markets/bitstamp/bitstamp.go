@@ -6,7 +6,12 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
+
+	"github.com/carlesar/cryptotradingbot/src/utils"
 )
+
+type Bitstamp struct{}
 
 // {"high": "2559.98",
 //  "last": "2559.25",
@@ -30,25 +35,17 @@ type TBitstampTicker struct {
 	Open      string `json:"open"`
 }
 
-type MyError struct {
-    errcode int
-}
-
-func (e *MyError) Error() string {
-    return fmt.Sprintf("Error code: %d", e.errcode)
-}
-
 // coinpair = btceur
-func DoGet(coinpair string) (float64, error) {
-    // Build the URL
+func (Bitstamp) DoGet(coinpair string) (float64, error) {
+	// Build the URL
 	url := fmt.Sprintf("https://www.bitstamp.net/api/v2/ticker/%s/", coinpair)
 
 	// Build the request
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-        fmt.Println("ERROR1")
+		fmt.Println("ERROR1")
 		// log.Fatal("NewRequest: ", err)
-        return -1, &MyError{13}
+		return -1, &utils.MyError{13}
 	}
 
 	// Build HTTP client
@@ -57,9 +54,9 @@ func DoGet(coinpair string) (float64, error) {
 	// Do send an HTTP request and return an HTTP response
 	resp, err := client.Do(req)
 	if err != nil {
-        fmt.Println("ERROR2")
+		fmt.Println("ERROR2")
 		// log.Fatal("Do: ", err)
-        return -1, &MyError{13}
+		return -1, &utils.MyError{13}
 	}
 
 	var bst TBitstampTicker
@@ -70,9 +67,9 @@ func DoGet(coinpair string) (float64, error) {
 	// Fill the record with JSON data
 	err = decoder.Decode(&bst)
 	if err != nil {
-        fmt.Println("ERROR3")
+		fmt.Println("ERROR3")
 		log.Println(err)
-        return -1, &MyError{13}
+		return -1, &utils.MyError{13}
 	}
 
 	// Callers should close resp.Body
@@ -80,25 +77,37 @@ func DoGet(coinpair string) (float64, error) {
 	// Defer the closing of the body
 	defer resp.Body.Close()
 
-    // Check not empty
-    if (bst.Last == "") {
-        fmt.Println("ERROR4")
-        return -1, &MyError{13}
-    }
+	// Check not empty
+	if bst.Last == "" {
+		fmt.Println("ERROR4")
+		return -1, &utils.MyError{13}
+	}
 
 	price, err := strconv.ParseFloat(bst.Last, 64)
 	if err != nil {
-        fmt.Println("ERROR5")
+		fmt.Println("ERROR5")
 		// log.Fatal("ParseFloat: ", err)
-        return -1, &MyError{13}
+		return -1, &utils.MyError{13}
 	}
 
-        /*
-    volume, err := strconv.ParseFloat(bst.Volume, 64)
-	if err != nil {
-		log.Fatal("ParseFloat: ", err)
-        return -1, &MyError{13}
-	}*/
+	/*
+		    volume, err := strconv.ParseFloat(bst.Volume, 64)
+			if err != nil {
+				log.Fatal("ParseFloat: ", err)
+		        return -1, &MyError{13}
+			}*/
 
 	return price, nil
+}
+
+func (Bitstamp) FormatCoinPair(buyCoin, sellCoin string) string {
+	return buyCoin + sellCoin
+}
+
+func (Bitstamp) HasInmediateTraining() bool {
+	return false
+}
+
+func (Bitstamp) DoGetTrainingValues(period time.Duration, coinpair string) (last24hValues []float64, err error) {
+	return nil, nil
 }
