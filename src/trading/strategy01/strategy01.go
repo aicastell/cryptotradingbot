@@ -22,6 +22,8 @@ func Start(buycoin string, sellcoin string, invest float64, period time.Duration
 	emaSlow.Reset(win_len_max)
 	emaVol.Reset(10)
 
+	fastGtSlow := int32(UNDEF)
+
 	var market generic.TMarket
 
 	market.Reset(buycoin, sellcoin, invest)
@@ -45,7 +47,7 @@ func Start(buycoin string, sellcoin string, invest float64, period time.Duration
 			}
 
 			updateEma(coinPrice, &emaFast, &emaSlow)
-			runEmas(&emaFast, &emaSlow, coinPrice, market)
+			runEmas(&emaFast, &emaSlow, coinPrice, &fastGtSlow, market)
 		}
 	} else {
 		iter := 0
@@ -65,7 +67,7 @@ func Start(buycoin string, sellcoin string, invest float64, period time.Duration
 				continue
 			}
 
-			runEmas(&emaFast, &emaSlow, coinPrice, market)
+			runEmas(&emaFast, &emaSlow, coinPrice, &fastGtSlow, market)
 		}
 	}
 }
@@ -83,20 +85,19 @@ func trainingModel(period time.Duration, pair string, emaFast, emaSlow *ema.TFin
 	}
 }
 
-func runEmas(emaFast, emaSlow *ema.TFinantial_EMA, coinPrice float64, market generic.TMarket) {
-	fastGtSlow := int32(UNDEF)
+func runEmas(emaFast, emaSlow *ema.TFinantial_EMA, coinPrice float64, fastGtSlow *int32, market generic.TMarket) {
 	// Initialize fast_gt_slow only once after training
-	if fastGtSlow == UNDEF {
+	if *fastGtSlow == UNDEF {
 		if emaFast.Ema() > emaSlow.Ema() {
-			fastGtSlow = TRUE
+			*fastGtSlow = TRUE
 		} else {
-			fastGtSlow = FALSE
+			*fastGtSlow = FALSE
 		}
 		fmt.Println("Training ready. Starting trade now...")
 		return
 	}
 
-	if fastGtSlow == FALSE {
+	if *fastGtSlow == FALSE {
 		if emaFast.Ema() < emaSlow.Ema() {
 			fmt.Println("ema_fast < ema_slow... Se mantiene la tendencia de bajada")
 			// tendency is maintained (falling price)
@@ -109,7 +110,7 @@ func runEmas(emaFast, emaSlow *ema.TFinantial_EMA, coinPrice float64, market gen
 		} else {
 			fmt.Println("===> Tocaba comprar pero ya estoy dentro")
 		}
-		fastGtSlow = TRUE
+		*fastGtSlow = TRUE
 	} else {
 		if emaFast.Ema() > emaSlow.Ema() {
 			fmt.Println("ema_fast > ema_slow... Se mantiene la tendencia de subida")
@@ -124,7 +125,7 @@ func runEmas(emaFast, emaSlow *ema.TFinantial_EMA, coinPrice float64, market gen
 			fmt.Println("===> Tocaba vender pero estoy fuera")
 
 		}
-		fastGtSlow = FALSE
+		*fastGtSlow = FALSE
 	}
 }
 
