@@ -129,7 +129,7 @@ func runEmas(emaFast, emaSlow *ema.TFinantial_EMA, coinPrice float64, market gen
 }
 
 func updateEma(coinPrice float64, emaFast, emaSlow *ema.TFinantial_EMA) {
-	emaFast.New_price(coinPrice)
-	emaSlow.New_price(coinPrice)
+	emaFast.NewPrice(coinPrice)
+	emaSlow.NewPrice(coinPrice)
 	fmt.Println("price: ", coinPrice, "ema_fast: ", emaFast.Ema(), "ema_slow: ", emaSlow.Ema(), "time: ", time.Now())
 }

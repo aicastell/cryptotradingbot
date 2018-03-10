@@ -38,9 +38,8 @@ func (ob *TFinantial_EMA) Ema () float64 {
     return ob.ema_cur
 }
 
-func (ob *TFinantial_EMA) New_price (price_cur float64) float64 {
+func (ob *TFinantial_EMA) NewPrice (price_cur float64) {
     ob.ema_cur = (ob.ema_ant + (ob.k * (price_cur - ob.ema_ant)))
     ob.ema_ant = ob.ema_cur
-    return ob.ema_cur
 }
 
