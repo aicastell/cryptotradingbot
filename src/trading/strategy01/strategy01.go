@@ -1,5 +1,7 @@
 package strategy01
 
+// This strategy uses pure EMA and nothing else
+
 import (
 	"fmt"
 	"time"
