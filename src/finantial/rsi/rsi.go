@@ -50,22 +50,22 @@ func (ob *TFinantial_RSI) Reset(win_len int, buy_level float64, sell_level float
 	ob.rsi = 0.0
 }
 
-func (ob *TFinantial_RS) Buy() bool {
-	if RSI() < ob.buy_level {
-		return true
-	}
-	return false
-}
-
-func (ob *TFinantial_RS) Sell() bool {
-	if RSI() > ob.sell_level {
-		return true
-	}
-	return false
-}
-
 func (ob *TFinantial_RSI) RSI() float64 {
 	return ob.rsi
+}
+
+func (ob *TFinantial_RSI) Buy() bool {
+	if ob.RSI() < ob.buy_level {
+		return true
+	}
+	return false
+}
+
+func (ob *TFinantial_RSI) Sell() bool {
+	if ob.RSI() > ob.sell_level {
+		return true
+	}
+	return false
 }
 
 func (ob *TFinantial_RSI) NewPrice(price_cur float64) {

@@ -1,7 +1,8 @@
 package main
 
 import (
-	"trading/strategy01"
+	//	"trading/strategy01"
+	"trading/strategy02"
 )
 
 func main() {
@@ -12,5 +13,6 @@ func main() {
 	// training_iters: 90 minutes
 	// win_len_min: 13
 	// win_len_max: 34
-	strategy01.Start("btc", "eur", 1000, 30, 90, 11, 24)
+	//strategy01.Start("btc", "eur", 1000, 30, 90, 11, 24)
+	strategy02.Start("btc", "eur", 1000, 300, 90, 11, 24, 14, 40.0, 60.0)
 }
