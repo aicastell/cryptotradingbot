@@ -6,12 +6,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"time"
-
-	"github.com/carlesar/cryptotradingbot/src/utils"
 )
-
-type Bitstamp struct{}
 
 // {"high": "2559.98",
 //  "last": "2559.25",
@@ -35,8 +30,16 @@ type TBitstampTicker struct {
 	Open      string `json:"open"`
 }
 
+type MyError struct {
+	errcode int
+}
+
+func (e *MyError) Error() string {
+	return fmt.Sprintf("Error code: %d", e.errcode)
+}
+
 // coinpair = btceur
-func (Bitstamp) DoGet(coinpair string) (float64, error) {
+func DoGet(coinpair string) (float64, error) {
 	// Build the URL
 	url := fmt.Sprintf("https://www.bitstamp.net/api/v2/ticker/%s/", coinpair)
 
@@ -45,7 +48,7 @@ func (Bitstamp) DoGet(coinpair string) (float64, error) {
 	if err != nil {
 		fmt.Println("ERROR1")
 		// log.Fatal("NewRequest: ", err)
-		return -1, &utils.MyError{13}
+		return -1, &MyError{13}
 	}
 
 	// Build HTTP client
@@ -56,7 +59,7 @@ func (Bitstamp) DoGet(coinpair string) (float64, error) {
 	if err != nil {
 		fmt.Println("ERROR2")
 		// log.Fatal("Do: ", err)
-		return -1, &utils.MyError{13}
+		return -1, &MyError{13}
 	}
 
 	var bst TBitstampTicker
@@ -69,7 +72,7 @@ func (Bitstamp) DoGet(coinpair string) (float64, error) {
 	if err != nil {
 		fmt.Println("ERROR3")
 		log.Println(err)
-		return -1, &utils.MyError{13}
+		return -1, &MyError{13}
 	}
 
 	// Callers should close resp.Body
@@ -80,14 +83,14 @@ func (Bitstamp) DoGet(coinpair string) (float64, error) {
 	// Check not empty
 	if bst.Last == "" {
 		fmt.Println("ERROR4")
-		return -1, &utils.MyError{13}
+		return -1, &MyError{13}
 	}
 
 	price, err := strconv.ParseFloat(bst.Last, 64)
 	if err != nil {
 		fmt.Println("ERROR5")
 		// log.Fatal("ParseFloat: ", err)
-		return -1, &utils.MyError{13}
+		return -1, &MyError{13}
 	}
 
 	/*
@@ -98,16 +101,4 @@ func (Bitstamp) DoGet(coinpair string) (float64, error) {
 			}*/
 
 	return price, nil
-}
-
-func (Bitstamp) FormatCoinPair(buyCoin, sellCoin string) string {
-	return buyCoin + sellCoin
-}
-
-func (Bitstamp) HasInmediateTraining() bool {
-	return false
-}
-
-func (Bitstamp) DoGetTrainingValues(period time.Duration, coinpair string) (last24hValues []float64, err error) {
-	return nil, nil
 }

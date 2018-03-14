@@ -1,137 +1,114 @@
 package strategy01
 
-// This strategy uses pure EMA and nothing else
-
 import (
+	"finantial/ema"
 	"fmt"
+	"markets/bitstamp"
+	"markets/generic"
 	"time"
-
-	"github.com/aicastell/cryptotradingbot/src/finantial/ema"
-	"github.com/aicastell/cryptotradingbot/src/markets/exchange"
-	"github.com/aicastell/cryptotradingbot/src/markets/generic"
 )
 
 var UNDEF = int32(-1)
 var TRUE = int32(1)
 var FALSE = int32(0)
-var fastGtSlow = int32(UNDEF)
 
-func Start(buycoin string, sellcoin string, invest float64, period time.Duration, training_iters int, win_len_min int, win_len_max int, exchange exchange.Exchange) {
-	var emaFast ema.TFinantial_EMA
-	var emaSlow ema.TFinantial_EMA
-	var emaVol ema.TFinantial_EMA
+func Start(buycoin string, sellcoin string, invest float64, period time.Duration, training_iters int, win_len_min int, win_len_max int) {
 
-	emaFast.Reset(win_len_min)
-	emaSlow.Reset(win_len_max)
-	emaVol.Reset(10)
+	var ema_fast ema.TFinantial_EMA
+	var ema_slow ema.TFinantial_EMA
+	var ema_vol ema.TFinantial_EMA
+
+	ema_fast.Reset(win_len_min)
+	ema_slow.Reset(win_len_max)
+	ema_vol.Reset(10)
 
 	var market generic.TMarket
 
 	market.Reset(buycoin, sellcoin, invest)
 
-	pair := exchange.FormatCoinPair(buycoin, sellcoin) // btceur
+	var fast_gt_slow = int32(UNDEF)
+
+	iter := 0
+	pair := buycoin + sellcoin // btceur
 
 	fmt.Println(pair)
 
-	if exchange.HasInmediateTraining() {
-		startTraining := time.Now()
-		trainingModel(period, pair, &emaFast, &emaSlow, market, exchange)
-		endTraining := time.Now()
-		fmt.Printf("%v seconds training.\n", endTraining.Sub(startTraining))
+	for {
+		time.Sleep(period * time.Second)
 
-		for {
-			time.Sleep(period)
-
-			coinPrice, err := exchange.DoGet(pair)
-			if err != nil {
-				fmt.Printf("Error getting current value %v. %v\n", pair, err)
-			}
-
-			updateEma(coinPrice, &emaFast, &emaSlow)
-			runEmas(&emaFast, &emaSlow, coinPrice, market)
+		price, err := bitstamp.DoGet(pair)
+		if err != nil {
+			fmt.Println("Error en el doget de bitstamp")
+			continue
 		}
-	} else {
-		iter := 0
-		for {
-			time.Sleep(period)
 
-			coinPrice, err := exchange.DoGet(pair)
-			if err != nil {
-				fmt.Printf("Error getting current value %v. %v\n", pair, err)
+		ema_fast.NewPrice(price)
+		ema_slow.NewPrice(price)
+		fmt.Println("price: ", price, "ema_fast: ", ema_fast.Ema(), "ema_slow: ", ema_slow.Ema(), "time: ", time.Now())
+
+		if iter < training_iters {
+			iter++
+			continue
+		}
+
+		// End of training, start trading
+
+		// Initialize fast_gt_slow only once after training
+		if fast_gt_slow == UNDEF {
+			if ema_fast.Ema() > ema_slow.Ema() {
+				fast_gt_slow = TRUE
+			} else {
+				fast_gt_slow = FALSE
 			}
+			fmt.Println("Training ready. Starting trade now...")
+			continue
+		}
 
-			updateEma(coinPrice, &emaFast, &emaSlow)
+		// fast_gt_slow already defined
 
-			if iter < training_iters {
-				iter++
-				fmt.Println(iter, training_iters)
+		/*
+		   if (market.InsideMarket()) {
+		       if (price < market.LastBuyPrice()) {
+		           market.DoSell(price)
+		           fmt.Println("********************************** Activated: CONTROL1")
+		           fmt.Println("********************************** VENDE a: ", market.LastSellPrice())
+		           fmt.Println("********************************** FIAT: ", market.Fiat())
+		       } else {
+		           fmt.Println("===> He comprado y esta subiendo, GOOD SIGNAL")
+		       }
+		   } */
+
+		if fast_gt_slow == FALSE {
+			if ema_fast.Ema() < ema_slow.Ema() {
+				fmt.Println("ema_fast < ema_slow... Se mantiene la tendencia de bajada")
+				// tendency is maintained (falling price)
 				continue
+			} else {
+				if market.InsideMarket() == false {
+					market.DoBuy(price)
+					fmt.Println("********************************** Buy at: ", market.LastBuyPrice())
+					fmt.Println("********************************** CRYPTO: ", market.Crypto())
+				} else {
+					fmt.Println("===> Tocaba comprar pero ya estoy dentro")
+				}
+				fast_gt_slow = TRUE
 			}
-
-			runEmas(&emaFast, &emaSlow, coinPrice, market)
-		}
-	}
-}
-
-func trainingModel(period time.Duration, pair string, emaFast, emaSlow *ema.TFinantial_EMA, market generic.TMarket, exchange exchange.Exchange) {
-	last24hValues, err := exchange.DoGetTrainingValues(period, pair)
-	if err != nil {
-		fmt.Printf("Error getting current value %v. %v\n", pair, err)
-	}
-
-	fmt.Println("Last 24h results: ", last24hValues)
-
-	for _, coinPrice := range last24hValues {
-		updateEma(coinPrice, emaFast, emaSlow)
-	}
-}
-
-func runEmas(emaFast, emaSlow *ema.TFinantial_EMA, coinPrice float64, market generic.TMarket) {
-	// Initialize fast_gt_slow only once after training
-	if fastGtSlow == UNDEF {
-		if emaFast.Ema() > emaSlow.Ema() {
-			fastGtSlow = TRUE
 		} else {
-			fastGtSlow = FALSE
+			if ema_fast.Ema() > ema_slow.Ema() {
+				fmt.Println("ema_fast > ema_slow... Se mantiene la tendencia de subida")
+				// tendency is maintained (climbing price)
+				continue
+			} else {
+				if market.InsideMarket() == true {
+					market.DoSell(price)
+					fmt.Println("********************************** Sell at: ", market.LastSellPrice())
+					fmt.Println("********************************** FIAT: ", market.Fiat())
+				} else {
+					fmt.Println("===> Tocaba vender pero estoy fuera")
+
+				}
+				fast_gt_slow = FALSE
+			}
 		}
-		fmt.Println("Training ready. Starting trade now...")
-		return
 	}
-
-	if fastGtSlow == FALSE {
-		if emaFast.Ema() < emaSlow.Ema() {
-			fmt.Println("ema_fast < ema_slow... Se mantiene la tendencia de bajada")
-			// tendency is maintained (falling price)
-			return
-		}
-		if market.InsideMarket() == false {
-			market.DoBuy(coinPrice)
-			fmt.Println("********************************** Buy at: ", market.LastBuyPrice())
-			fmt.Println("********************************** CRYPTO: ", market.Crypto())
-		} else {
-			fmt.Println("===> Tocaba comprar pero ya estoy dentro")
-		}
-		fastGtSlow = TRUE
-	} else {
-		if emaFast.Ema() > emaSlow.Ema() {
-			fmt.Println("ema_fast > ema_slow... Se mantiene la tendencia de subida")
-			// tendency is maintained (climbing price)
-			return
-		}
-		if market.InsideMarket() == true {
-			market.DoSell(coinPrice)
-			fmt.Println("********************************** Sell at: ", market.LastSellPrice())
-			fmt.Println("********************************** FIAT: ", market.Fiat())
-		} else {
-			fmt.Println("===> Tocaba vender pero estoy fuera")
-
-		}
-		fastGtSlow = FALSE
-	}
-}
-
-func updateEma(coinPrice float64, emaFast, emaSlow *ema.TFinantial_EMA) {
-	emaFast.NewPrice(coinPrice)
-	emaSlow.NewPrice(coinPrice)
-	fmt.Println("price: ", coinPrice, "ema_fast: ", emaFast.Ema(), "ema_slow: ", emaSlow.Ema(), "time: ", time.Now())
 }

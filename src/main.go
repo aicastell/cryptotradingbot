@@ -1,10 +1,7 @@
 package main
 
 import (
-	"time"
-
-	"github.com/aicastell/cryptotradingbot/src/trading/strategy01"
-	"github.com/carlesar/cryptotradingbot/src/markets/bitstamp"
+	"trading/strategy01"
 )
 
 func main() {
@@ -15,7 +12,5 @@ func main() {
 	// training_iters: 90 minutes
 	// win_len_min: 13
 	// win_len_max: 34
-	// exchange: poloniex
-	//strategy01.Start("BTC", "XMR", 1000, 300*time.Second, 90, 13, 34, &poloniex.Poloniex{})
-	strategy01.Start("btc", "eur", 1000, 60*time.Second, 90, 13, 34, &bitstamp.Bitstamp{})
+	strategy01.Start("btc", "eur", 1000, 30, 90, 11, 24)
 }
