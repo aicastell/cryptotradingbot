@@ -46,7 +46,8 @@ func Start(buycoin string, sellcoin string, invest float64, period time.Duration
 
 		ema_fast.NewPrice(price)
 		ema_slow.NewPrice(price)
-		fmt.Println("price: ", price, "ema_fast: ", ema_fast.Ema(), "ema_slow: ", ema_slow.Ema(), "time: ", time.Now())
+		rsi.NewPrice(price)
+		fmt.Println("price: ", price, "ema_fast: ", ema_fast.Ema(), "ema_slow: ", ema_slow.Ema(), "rsi: ", rsi.RSI(), "time: ", time.Now())
 
 		if iter < training_iters {
 			iter++
