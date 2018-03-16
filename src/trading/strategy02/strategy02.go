@@ -47,7 +47,11 @@ func Start(buycoin string, sellcoin string, invest float64, period time.Duration
 		ema_fast.NewPrice(price)
 		ema_slow.NewPrice(price)
 		rsi.NewPrice(price)
-		fmt.Println("price: ", price, "ema_fast: ", ema_fast.Ema(), "ema_slow: ", ema_slow.Ema(), "rsi: ", rsi.RSI(), "time: ", time.Now())
+		fmt.Println("price: ", fmt.Sprintf("%.2f", price),
+			"\tema_fast: ", fmt.Sprintf("%.2f", ema_fast.Ema()),
+			"\tema_slow: ", fmt.Sprintf("%.2f", ema_slow.Ema()),
+			"\trsi: ", fmt.Sprintf("%.2f", rsi.RSI()),
+			"\ttime: ", time.Now())
 
 		if iter < training_iters {
 			iter++
@@ -87,13 +91,16 @@ func Start(buycoin string, sellcoin string, invest float64, period time.Duration
 				// tendency is maintained (falling price)
 				continue
 			} else {
+				fmt.Println("ema_fast > ema_slow... Cambio de tendencia, comprobemos si se puede comprar")
 				if market.InsideMarket() == false {
+					fmt.Println("InsideMarket = false")
 					if rsi.Buy() {
 						market.DoBuy(price)
 						fmt.Println("********************************** Buy at: ", market.LastBuyPrice())
 						fmt.Println("********************************** CRYPTO: ", market.Crypto())
 					} else {
-						fmt.Println("Improper RSI to buy: ", rsi.RSI())
+						fmt.Println("Improper RSI to buy: ", rsi.RSI(), "rsi.BuyLevel = ", rsi.BuyLevel())
+						continue
 					}
 				} else {
 					fmt.Println("===> Tocaba comprar pero ya estoy dentro")
@@ -106,13 +113,16 @@ func Start(buycoin string, sellcoin string, invest float64, period time.Duration
 				// tendency is maintained (climbing price)
 				continue
 			} else {
+				fmt.Println("ema_fast < ema_slow... Cambio de tendencia, comprobemos si se puede vender")
 				if market.InsideMarket() == true {
+					fmt.Println("InsideMarket = true")
 					if rsi.Sell() {
 						market.DoSell(price)
 						fmt.Println("********************************** Sell at: ", market.LastSellPrice())
 						fmt.Println("********************************** FIAT: ", market.Fiat())
 					} else {
-						fmt.Println("Improper RSI to sell: ", rsi.RSI())
+						fmt.Println("Improper RSI to sell: ", rsi.RSI(), "rsi.SellLevel = ", rsi.SellLevel())
+						continue
 					}
 
 				} else {

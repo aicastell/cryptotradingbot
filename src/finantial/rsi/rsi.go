@@ -61,11 +61,19 @@ func (ob *TFinantial_RSI) Buy() bool {
 	return false
 }
 
+func (ob *TFinantial_RSI) BuyLevel() float64 {
+	return ob.buy_level
+}
+
 func (ob *TFinantial_RSI) Sell() bool {
 	if ob.RSI() > ob.sell_level {
 		return true
 	}
 	return false
+}
+
+func (ob *TFinantial_RSI) SellLevel() float64 {
+	return ob.sell_level
 }
 
 func (ob *TFinantial_RSI) NewPrice(price_cur float64) {

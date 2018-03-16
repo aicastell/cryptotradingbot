@@ -14,5 +14,5 @@ func main() {
 	// win_len_min: 13
 	// win_len_max: 34
 	//strategy01.Start("btc", "eur", 1000, 30, 90, 11, 24)
-	strategy02.Start("btc", "eur", 1000, 300, 90, 11, 24, 14, 40.0, 60.0)
+	strategy02.Start("btc", "eur", 1000, 60, 90, 11, 24, 14, 40.0, 60.0)
 }
