@@ -13,7 +13,7 @@ var UNDEF = int32(-1)
 var TRUE = int32(1)
 var FALSE = int32(0)
 
-func Start(buycoin string, sellcoin string, invest float64, period time.Duration, training_iters int, win_len_min int, win_len_max int, rsi_win_len int, rsi_buy_level float64, rsi_sell_level float64) {
+func Start(buycoin string, sellcoin string, invest float64, fee float64, period time.Duration, training_iters int, win_len_min int, win_len_max int, rsi_win_len int, rsi_buy_level float64, rsi_sell_level float64) {
 	var ema_fast ema.TFinantial_EMA
 	var ema_slow ema.TFinantial_EMA
 	var rsi rsi.TFinantial_RSI
@@ -26,7 +26,7 @@ func Start(buycoin string, sellcoin string, invest float64, period time.Duration
 
 	var market generic.TMarket
 
-	market.Reset(buycoin, sellcoin, invest)
+	market.Reset(buycoin, sellcoin, invest, fee)
 
 	var fast_gt_slow = int32(UNDEF)
 
