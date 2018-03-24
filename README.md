@@ -84,12 +84,17 @@ below 30.
 
 ## Compilation
 
-You need a Go compiler:
+You need a Go compiler to compile project:
 
+    $ git clone https://github.com/aicastell/cryptotradingbot.git
+    $ export GOPATH=/path/to/cryptotradingbot
     $ go build
     $ go install
 
-After you can start bot with:
+After you can execute bot setting config file:
 
     $ bot -c /path/to/config.json
+    $ bot -c=/path/to/config.json
+
+If you don't set a config file, /etc/trabot.d/trabot.json is used as default
 
