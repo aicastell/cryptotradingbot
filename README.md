@@ -56,27 +56,29 @@ below 30.
 
 ## Compilation
 
-You need a Go compiler to compile project:
+You need a Go compiler installed. Then follow this steps:
 
     $ git clone https://github.com/aicastell/cryptotradingbot.git
     $ export GOPATH=/path/to/cryptotradingbot
     $ go build
     $ go install
 
-After you can execute bot setting config file:
+
+## Execution
+
+Once compiled, you can execute bot. You need a config.json file available (see below):
 
     $ bot -c /path/to/config.json
     $ bot -c=/path/to/config.json
 
-If you don't set a config file, /etc/trabot.d/trabot.json is used as default
+If you don't set a config file, bot uses /etc/trabot.d/trabot.json as default config.
 
 
 ## Configuration file
 
-Cryptotradingbot configuration file must be set with a JSON file following this internal format:
+Cryptotradingbot configuration file is a JSON file with this internal format:
 
     $ cat /etc/trabot.d/trabot.json
-
     {
         "global": {
             "strategy": "strategy02",
@@ -89,8 +91,8 @@ Cryptotradingbot configuration file must be set with a JSON file following this 
             "training_iters": 90
         },
         "ema": {
-            "win_len_min": 11,
-            "win_len_max": 24
+            "fast": 11,
+            "slow": 24
         },
         "rsi": {
             "win_len": 14,
