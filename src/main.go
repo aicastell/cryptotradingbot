@@ -2,6 +2,7 @@ package main
 
 import (
 	//	"trading/strategy01"
+    "config"
 	"trading/strategy02"
 )
 
@@ -15,5 +16,21 @@ func main() {
 	// win_len_min: 13
 	// win_len_max: 34
 	//strategy01.Start("btc", "eur", 1000, 30, 90, 11, 24)
-	strategy02.Start("btc", "eur", 1000, 0.25, 60, 90, 11, 24, 14, 40.0, 60.0)
+
+    var gconf config.TConfig_Bot
+
+    gconf.LoadConfig()
+    gconf.Log()
+
+	strategy02.Start(gconf.Global.BuyCoin,
+                     gconf.Global.SellCoin,
+                     gconf.Global.Invest,
+                     gconf.Global.Fee,
+                     gconf.Global.Period,
+                     gconf.Global.TrainingIters,
+                     gconf.EMA.WinLenMin,
+                     gconf.EMA.WinLenMax,
+                     gconf.RSI.WinLen,
+                     gconf.RSI.BuyLevel,
+                     gconf.RSI.SellLevel)
 }

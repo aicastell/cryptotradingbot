@@ -3,10 +3,51 @@ Cryptotradingbot
 This is the crypto trading bot I am working on to automate buy and sell
 operations on different cryto exchanges and with different trading strategies.
 
-Currently I am working to support "bitstamp" exchange with a basic/simple EMA
-strategy (Exponential Moving Average).
 
-EMA offers a smooth relation between price and time. I am using this maths:
+= Trading Strategies =
+
+This bot currently supports "bitstamp" exchange with two trading strategies:
+
+    * strategy01: basic EMA (Exponential Moving Average)
+    * strategy02: advanced EMA + RSI (Relative Strength Index)
+
+
+= Bot configuration =
+
+Bot can be setup with a configuration file in this format:
+
+    $ cat config.json
+    {
+        "global": {
+            "strategy": "strategy02",
+            "fetcher": "poloniex",
+            "buycoin": "btc",
+            "sellcoin": "eur",
+            "invest": 1000,
+            "fee": 0.25,
+            "period": 60,
+            "training_iters": 90
+        },
+        "ema": {
+            "win_len_min": 11,
+            "win_len_max": 24
+        },
+        "rsi": {
+            "win_len": 14,
+            "buy_level": 40.0,
+            "sell_level": 60.0
+        }
+    }
+
+You can start bot with:
+
+    $ bot -c /path/to/config.json
+
+
+
+= Finantial Indicators =
+
+The Exponential Moving Average (EMA) offers a smooth relation between price and time. I am using this maths:
 
     EMA(t) = EMA(t – 1) + K*[Precio(t) – EMA(t – 1)]
 
@@ -29,4 +70,9 @@ The strategy01 consist of:
     * Sell when (EMA_13(t) > EMA_34(t)) AND (EMA13(t+1) < EMA34(t+1))
 
 You should play with tradingview.com to see the behaviour of this setup.
+
+The Relative Strength Index (RSI) is a momentum oscillator that measures the
+speed and change of price movements. The RSI oscillates between zero and 100.
+Traditionally the RSI is considered overbought when above 70 and oversold when
+below 30.
 
