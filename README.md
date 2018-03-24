@@ -13,34 +13,6 @@ Currently it supports:
     * strategy02: advanced EMA + RSI (Relative Strength Index)
 
 
-## Bot configuration
-
-Cryptotradingbot configuration can be set with a JSON file in this format:
-
-    $ cat config.json
-    {
-        "global": {
-            "strategy": "strategy02",
-            "fetcher": "poloniex",
-            "buycoin": "btc",
-            "sellcoin": "eur",
-            "invest": 1000,
-            "fee": 0.25,
-            "period": 60,
-            "training_iters": 90
-        },
-        "ema": {
-            "win_len_min": 11,
-            "win_len_max": 24
-        },
-        "rsi": {
-            "win_len": 14,
-            "buy_level": 40.0,
-            "sell_level": 60.0
-        }
-    }
-
-
 ## Finantial Indicators
 
 Currently two finantial indicators are implemented: EMA and RSI.
@@ -97,4 +69,33 @@ After you can execute bot setting config file:
     $ bot -c=/path/to/config.json
 
 If you don't set a config file, /etc/trabot.d/trabot.json is used as default
+
+
+## Configuration file
+
+Cryptotradingbot configuration file must be set with a JSON file following this internal format:
+
+    $ cat /etc/trabot.d/trabot.json
+
+    {
+        "global": {
+            "strategy": "strategy02",
+            "fetcher": "poloniex",
+            "buycoin": "btc",
+            "sellcoin": "eur",
+            "invest": 1000,
+            "fee": 0.25,
+            "period": 60,
+            "training_iters": 90
+        },
+        "ema": {
+            "win_len_min": 11,
+            "win_len_max": 24
+        },
+        "rsi": {
+            "win_len": 14,
+            "buy_level": 40.0,
+            "sell_level": 60.0
+        }
+    }
 
