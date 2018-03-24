@@ -1,20 +1,21 @@
-Cryptotradingbot
+# Cryptotradingbot
 
 This is the crypto trading bot I am working on to automate buy and sell
-operations on different cryto exchanges and with different trading strategies.
+operations on different exchanges.
 
 
-= Trading Strategies =
+## Trading Strategies
 
-This bot currently supports "bitstamp" exchange with two trading strategies:
+Cryptotradingbot is being designed to accept different trading strategies.
+Currently it supports:
 
     * strategy01: basic EMA (Exponential Moving Average)
     * strategy02: advanced EMA + RSI (Relative Strength Index)
 
 
-= Bot configuration =
+## Bot configuration
 
-Bot can be setup with a configuration file in this format:
+Cryptotradingbot configuration can be set with a JSON file in this format:
 
     $ cat config.json
     {
@@ -39,15 +40,15 @@ Bot can be setup with a configuration file in this format:
         }
     }
 
-You can start bot with:
 
-    $ bot -c /path/to/config.json
+## Finantial Indicators
+
+Currently two finantial indicators are implemented: EMA and RSI.
 
 
+### Exponential Moving Average (EMA)
 
-= Finantial Indicators =
-
-The Exponential Moving Average (EMA) offers a smooth relation between price and time. I am using this maths:
+The Exponential Moving Average offers a smooth relation between price and time. I am using this maths:
 
     EMA(t) = EMA(t – 1) + K*[Precio(t) – EMA(t – 1)]
 
@@ -71,8 +72,24 @@ The strategy01 consist of:
 
 You should play with tradingview.com to see the behaviour of this setup.
 
+
+### Relative Strength Index (RSI)
+
 The Relative Strength Index (RSI) is a momentum oscillator that measures the
 speed and change of price movements. The RSI oscillates between zero and 100.
 Traditionally the RSI is considered overbought when above 70 and oversold when
 below 30.
+
+
+
+## Compilation
+
+You need a Go compiler:
+
+    $ go build
+    $ go install
+
+After you can start bot with:
+
+    $ bot -c /path/to/config.json
 
