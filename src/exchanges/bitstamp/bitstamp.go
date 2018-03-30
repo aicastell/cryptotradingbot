@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+    "config"
 )
 
 // {"high": "2559.98",
@@ -17,6 +18,10 @@ import (
 //  "low": "2423.51",
 //  "ask": "2559.25",
 //  "open": "2519.00"}
+
+type TBitstamp struct {
+    Config     *config.TBotConfig
+}
 
 type TBitstampTicker struct {
 	High      string `json:"high"`
@@ -38,8 +43,12 @@ func (e *MyError) Error() string {
 	return fmt.Sprintf("Error code: %d", e.errcode)
 }
 
+func (ob *TBitstamp) SetConfig(cfg * config.TBotConfig) {
+    ob.Config = cfg
+}
+
 // coinpair = btceur
-func DoGet(coinpair string) (float64, error) {
+func (ob *TBitstamp) GetPrice(coinpair string) (float64, error) {
 	// Build the URL
 	url := fmt.Sprintf("https://www.bitstamp.net/api/v2/ticker/%s/", coinpair)
 

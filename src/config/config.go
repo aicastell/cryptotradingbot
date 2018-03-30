@@ -54,13 +54,13 @@ type TConfig_RSI struct {
 	SellLevel float64 `json:"sell_level"`
 }
 
-type TConfig_Bot struct {
+type TBotConfig struct {
 	Global TConfig_Global `json:"global"`
 	EMA    TConfig_EMA    `json:"ema"`
 	RSI    TConfig_RSI    `json:"rsi"`
 }
 
-func (gconf *TConfig_Bot) LoadConfig() {
+func (gconf *TBotConfig) LoadConfig() {
 	filename := flag.String("c", "/etc/trabot.d/trabot.conf", "Trading bot configuration file")
 	flag.Parse()
 
@@ -78,7 +78,7 @@ func (gconf *TConfig_Bot) LoadConfig() {
 	}
 }
 
-func (gconf *TConfig_Bot) Log() {
+func (gconf *TBotConfig) Log() {
 	fmt.Println("**********************************")
 	fmt.Println("Configuration summary:")
 	fmt.Println("**********************************")
@@ -103,7 +103,7 @@ func (gconf *TConfig_Bot) Log() {
 /*
 func main() {
 
-    var gconf TConfig_Bot
+    var gconf TBotConfig
 
     filename := flag.String("c", "/etc/trabot.d/trabot.conf", "Trading bot configuration file")
     flag.Parse()

@@ -1,4 +1,4 @@
-package generic
+package market
 
 type TMarket struct {
 	coincrypto    string  // bitcoin

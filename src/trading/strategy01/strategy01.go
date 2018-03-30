@@ -1,44 +1,49 @@
 package strategy01
 
 import (
-	"finantial/ema"
 	"fmt"
-	"markets/bitstamp"
-	"markets/generic"
 	"time"
+    "config"
+    "fetcher"
+    "finantial/ema"
+    "market"
 )
 
-var UNDEF = int32(-1)
-var TRUE = int32(1)
-var FALSE = int32(0)
+const (
+    UNDEF = int32(-1)
+    TRUE = int32(1)
+    FALSE = int32(0)
+)
 
-func Start(buycoin string, sellcoin string, invest float64, fee float64, period int, training_iters int, fast int, slow int) {
+type TStrag01 struct {}
+
+func (ob *TStrag01) Start(cfg *config.TBotConfig, input *fetcher.TFetcher) {
 
 	var ema_fast ema.TFinantial_EMA
 	var ema_slow ema.TFinantial_EMA
 	var ema_vol ema.TFinantial_EMA
 
-	ema_fast.Reset(fast)
-	ema_slow.Reset(slow)
+	ema_fast.Reset(cfg.EMA.Fast)
+	ema_slow.Reset(cfg.EMA.Slow)
 	ema_vol.Reset(10)
 
-	var market generic.TMarket
+	var mm market.TMarket
 
-	market.Reset(buycoin, sellcoin, invest, fee)
+	mm.Reset(cfg.Global.BuyCoin, cfg.Global.SellCoin, cfg.Global.Invest, cfg.Global.Fee)
 
 	var fast_gt_slow = int32(UNDEF)
 
 	iter := 0
-	pair := buycoin + sellcoin // btceur
+	pair := cfg.Global.BuyCoin + cfg.Global.SellCoin // btceur
 
 	fmt.Println(pair)
 
 	for {
-		time.Sleep(time.Duration(period) * time.Second)
+		time.Sleep(time.Duration(cfg.Global.Period) * time.Second)
 
-		price, err := bitstamp.DoGet(pair)
+		price, err := (*input).GetPrice(pair)
 		if err != nil {
-			fmt.Println("Error en el doget de bitstamp")
+			fmt.Println("Error en el metodo GetPrice")
 			continue
 		}
 
@@ -46,7 +51,7 @@ func Start(buycoin string, sellcoin string, invest float64, fee float64, period 
 		ema_slow.NewPrice(price)
 		fmt.Println("price: ", price, "ema_fast: ", ema_fast.Ema(), "ema_slow: ", ema_slow.Ema(), "time: ", time.Now())
 
-		if iter < training_iters {
+		if iter < cfg.Global.TrainingIters {
 			iter++
 			continue
 		}
@@ -67,12 +72,12 @@ func Start(buycoin string, sellcoin string, invest float64, fee float64, period 
 		// fast_gt_slow already defined
 
 		/*
-		   if (market.InsideMarket()) {
-		       if (price < market.LastBuyPrice()) {
-		           market.DoSell(price)
+		   if (mm.InsideMarket()) {
+		       if (price < mm.LastBuyPrice()) {
+		           mm.DoSell(price)
 		           fmt.Println("********************************** Activated: CONTROL1")
-		           fmt.Println("********************************** VENDE a: ", market.LastSellPrice())
-		           fmt.Println("********************************** FIAT: ", market.Fiat())
+		           fmt.Println("********************************** VENDE a: ", mm.LastSellPrice())
+		           fmt.Println("********************************** FIAT: ", mm.Fiat())
 		       } else {
 		           fmt.Println("===> He comprado y esta subiendo, GOOD SIGNAL")
 		       }
@@ -84,10 +89,10 @@ func Start(buycoin string, sellcoin string, invest float64, fee float64, period 
 				// tendency is maintained (falling price)
 				continue
 			} else {
-				if market.InsideMarket() == false {
-					market.DoBuy(price)
-					fmt.Println("********************************** Buy at: ", market.LastBuyPrice())
-					fmt.Println("********************************** CRYPTO: ", market.Crypto())
+				if mm.InsideMarket() == false {
+					mm.DoBuy(price)
+					fmt.Println("********************************** Buy at: ", mm.LastBuyPrice())
+					fmt.Println("********************************** CRYPTO: ", mm.Crypto())
 				} else {
 					fmt.Println("===> Tocaba comprar pero ya estoy dentro")
 				}
@@ -99,10 +104,10 @@ func Start(buycoin string, sellcoin string, invest float64, fee float64, period 
 				// tendency is maintained (climbing price)
 				continue
 			} else {
-				if market.InsideMarket() == true {
-					market.DoSell(price)
-					fmt.Println("********************************** Sell at: ", market.LastSellPrice())
-					fmt.Println("********************************** FIAT: ", market.Fiat())
+				if mm.InsideMarket() == true {
+					mm.DoSell(price)
+					fmt.Println("********************************** Sell at: ", mm.LastSellPrice())
+					fmt.Println("********************************** FIAT: ", mm.Fiat())
 				} else {
 					fmt.Println("===> Tocaba vender pero estoy fuera")
 

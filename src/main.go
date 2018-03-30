@@ -1,26 +1,64 @@
 package main
 
 import (
-	//	"trading/strategy01"
+    "os"
+    "fmt"
 	"config"
-	"trading/strategy02"
+    "exchanges/bitstamp"
+    "exchanges/poloniex"
+    "inputs/datafile"
+    "inputs/stdinput"
+    "trading/strategy01"
+    "trading/strategy02"
+    "fetcher"
 )
 
 func main() {
-	var gconf config.TConfig_Bot
+    // Read and load configuration file
+	var cfg config.TBotConfig
+	cfg.LoadConfig()
+	cfg.Log()
 
-	gconf.LoadConfig()
-	gconf.Log()
+    // Declare infetch generic pointer
+    var infetch *fetcher.TFetcher
+    infetch = new(fetcher.TFetcher)
 
-	strategy02.Start(gconf.Global.BuyCoin,
-		gconf.Global.SellCoin,
-		gconf.Global.Invest,
-		gconf.Global.Fee,
-		gconf.Global.Period,
-		gconf.Global.TrainingIters,
-		gconf.EMA.Fast,
-		gconf.EMA.Slow,
-		gconf.RSI.WinLen,
-		gconf.RSI.BuyLevel,
-		gconf.RSI.SellLevel)
+    // Declare different sources of prices
+    var src00 bitstamp.TBitstamp
+    var src01 poloniex.TPoloniex
+    var src02 datafile.TDataFile
+    var src03 stdinput.TStdInput
+
+    // Point to proper fetcher
+    if cfg.Global.Fetcher == "bitstamp" {
+	    *infetch = &src00
+    } else if cfg.Global.Fetcher == "poloniex" {
+        *infetch = &src01
+    } else if cfg.Global.Fetcher == "datafile" {
+        *infetch = &src02
+    } else if cfg.Global.Fetcher == "stdin" {
+        *infetch = &src03
+    } else {
+        fmt.Println("Unknown strategy")
+        os.Exit(1)
+    }
+
+    // Configure input fetcher
+    (*infetch).SetConfig(&cfg)
+
+    // Declare different strategies
+    var strategy01 strategy01.TStrag01
+    var strategy02 strategy02.TStrag02
+
+    // Start proper strategy
+	if cfg.Global.Strategy == "strategy01" {
+		strategy01.Start(&cfg, infetch)
+	} else if cfg.Global.Strategy == "strategy02" {
+		strategy02.Start(&cfg, infetch)
+	} else {
+		fmt.Println("Unknown strategy")
+        os.Exit(1)
+	}
+
+    os.Exit(0)
 }
