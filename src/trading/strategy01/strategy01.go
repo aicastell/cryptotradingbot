@@ -1,21 +1,21 @@
 package strategy01
 
 import (
+	"config"
+	"fetcher"
+	"finantial/ema"
 	"fmt"
+	"market"
 	"time"
-    "config"
-    "fetcher"
-    "finantial/ema"
-    "market"
 )
 
 const (
-    UNDEF = int32(-1)
-    TRUE = int32(1)
-    FALSE = int32(0)
+	UNDEF = int32(-1)
+	TRUE  = int32(1)
+	FALSE = int32(0)
 )
 
-type TStrag01 struct {}
+type TStrag01 struct{}
 
 func (ob *TStrag01) Start(cfg *config.TBotConfig, input *fetcher.TFetcher) {
 

@@ -1,17 +1,17 @@
 package stdinput
 
 import (
-    "config"
+	"config"
 )
 
 type TStdInput struct {
-    Config *config.TBotConfig
+	Config *config.TBotConfig
 }
 
 func (ob *TStdInput) SetConfig(cfg *config.TBotConfig) {
-    ob.Config = cfg
+	ob.Config = cfg
 }
 
 func (ob *TStdInput) GetPrice(coinpair string) (price float64, err error) {
-     return price, nil
+	return price, nil
 }

@@ -1,11 +1,10 @@
 package fetcher
 
 import (
-    "config"
+	"config"
 )
 
 type TFetcher interface {
-    SetConfig(cfg * config.TBotConfig)
-    GetPrice(coinpair string) (price float64, err error)
+	SetConfig(cfg *config.TBotConfig)
+	GetPrice(coinpair string) (price float64, err error)
 }
-

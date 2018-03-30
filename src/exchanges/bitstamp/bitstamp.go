@@ -1,12 +1,12 @@
 package bitstamp
 
 import (
+	"config"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"strconv"
-    "config"
 )
 
 // {"high": "2559.98",
@@ -20,7 +20,7 @@ import (
 //  "open": "2519.00"}
 
 type TBitstamp struct {
-    Config     *config.TBotConfig
+	Config *config.TBotConfig
 }
 
 type TBitstampTicker struct {
@@ -43,12 +43,15 @@ func (e *MyError) Error() string {
 	return fmt.Sprintf("Error code: %d", e.errcode)
 }
 
-func (ob *TBitstamp) SetConfig(cfg * config.TBotConfig) {
-    ob.Config = cfg
+func (ob *TBitstamp) SetConfig(cfg *config.TBotConfig) {
+	ob.Config = cfg
 }
 
 // coinpair = btceur
 func (ob *TBitstamp) GetPrice(coinpair string) (float64, error) {
+
+	fmt.Println("GetPrice en bitstamp")
+
 	// Build the URL
 	url := fmt.Sprintf("https://www.bitstamp.net/api/v2/ticker/%s/", coinpair)
 

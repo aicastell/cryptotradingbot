@@ -1,22 +1,22 @@
 package strategy02
 
 import (
+	"config"
+	"fetcher"
+	"finantial/ema"
+	"finantial/rsi"
 	"fmt"
+	"market"
 	"time"
-    "config"
-    "fetcher"
-    "finantial/ema"
-    "finantial/rsi"
-    "market"
 )
 
 const (
-    UNDEF = int32(-1)
-    TRUE = int32(1)
-    FALSE = int32(0)
+	UNDEF = int32(-1)
+	TRUE  = int32(1)
+	FALSE = int32(0)
 )
 
-type TStrag02 struct {}
+type TStrag02 struct{}
 
 func (ob *TStrag02) Start(cfg *config.TBotConfig, input *fetcher.TFetcher) {
 
