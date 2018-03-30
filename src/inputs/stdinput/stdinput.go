@@ -2,6 +2,7 @@ package stdinput
 
 import (
 	"config"
+	"fmt"
 )
 
 type TStdInput struct {
@@ -13,5 +14,6 @@ func (ob *TStdInput) SetConfig(cfg *config.TBotConfig) {
 }
 
 func (ob *TStdInput) GetPrice(coinpair string) (price float64, err error) {
-	return price, nil
+	fmt.Println("GetPrice en stdinput")
+	return 2.0, nil
 }

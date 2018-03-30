@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"utils"
 )
 
 // {"high": "2559.98",
@@ -35,21 +36,11 @@ type TBitstampTicker struct {
 	Open      string `json:"open"`
 }
 
-type MyError struct {
-	errcode int
-}
-
-func (e *MyError) Error() string {
-	return fmt.Sprintf("Error code: %d", e.errcode)
-}
-
 func (ob *TBitstamp) SetConfig(cfg *config.TBotConfig) {
 	ob.Config = cfg
 }
 
-// coinpair = btceur
 func (ob *TBitstamp) GetPrice(coinpair string) (float64, error) {
-
 	fmt.Println("GetPrice en bitstamp")
 
 	// Build the URL
@@ -60,7 +51,7 @@ func (ob *TBitstamp) GetPrice(coinpair string) (float64, error) {
 	if err != nil {
 		fmt.Println("ERROR1")
 		// log.Fatal("NewRequest: ", err)
-		return -1, &MyError{13}
+		return -1, &utils.MyError{13}
 	}
 
 	// Build HTTP client
@@ -71,7 +62,7 @@ func (ob *TBitstamp) GetPrice(coinpair string) (float64, error) {
 	if err != nil {
 		fmt.Println("ERROR2")
 		// log.Fatal("Do: ", err)
-		return -1, &MyError{13}
+		return -1, &utils.MyError{13}
 	}
 
 	var bst TBitstampTicker
@@ -84,7 +75,7 @@ func (ob *TBitstamp) GetPrice(coinpair string) (float64, error) {
 	if err != nil {
 		fmt.Println("ERROR3")
 		log.Println(err)
-		return -1, &MyError{13}
+		return -1, &utils.MyError{13}
 	}
 
 	// Callers should close resp.Body
@@ -95,21 +86,21 @@ func (ob *TBitstamp) GetPrice(coinpair string) (float64, error) {
 	// Check not empty
 	if bst.Last == "" {
 		fmt.Println("ERROR4")
-		return -1, &MyError{13}
+		return -1, &utils.MyError{13}
 	}
 
 	price, err := strconv.ParseFloat(bst.Last, 64)
 	if err != nil {
 		fmt.Println("ERROR5")
 		// log.Fatal("ParseFloat: ", err)
-		return -1, &MyError{13}
+		return -1, &utils.MyError{13}
 	}
 
 	/*
 		    volume, err := strconv.ParseFloat(bst.Volume, 64)
 			if err != nil {
 				log.Fatal("ParseFloat: ", err)
-		        return -1, &MyError{13}
+		        return -1, &utils.MyError{13}
 			}*/
 
 	return price, nil
