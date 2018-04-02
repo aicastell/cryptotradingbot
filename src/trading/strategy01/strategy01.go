@@ -39,8 +39,6 @@ func (ob *TStrag01) Start(cfg *config.TBotConfig, input *fetcher.TFetcher) {
 	fmt.Println(pair)
 
 	for {
-		time.Sleep(time.Duration(cfg.Global.Period) * time.Second)
-
 		price, err := (*input).GetPrice(pair)
 		if err != nil {
 			fmt.Println("Error en el metodo GetPrice")

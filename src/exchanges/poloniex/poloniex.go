@@ -6,11 +6,16 @@ import (
 	"fmt"
 	"github.com/jaracil/ei"
 	"net/http"
+	"time"
 	"utils"
 )
 
 type TPoloniex struct {
 	Config *config.TBotConfig
+}
+
+func (ob *TPoloniex) Create() {
+	fmt.Println("Initializing Poloniex Input...")
 }
 
 func (ob *TPoloniex) SetConfig(cfg *config.TBotConfig) {
@@ -19,6 +24,8 @@ func (ob *TPoloniex) SetConfig(cfg *config.TBotConfig) {
 
 func (ob *TPoloniex) GetPrice(coinpair string) (lastValue float64, err error) {
 	fmt.Println("GetPrice en poloniex")
+
+	time.Sleep(time.Duration(ob.Config.Global.Period) * time.Second)
 
 	url := "https://poloniex.com/public?command=returnTicker"
 	req, err := http.NewRequest("GET", url, nil)
@@ -52,4 +59,8 @@ func (ob *TPoloniex) GetPrice(coinpair string) (lastValue float64, err error) {
 		}
 	}
 	return 0, nil
+}
+
+func (ob *TPoloniex) Destroy() {
+	fmt.Println("Destroying Poloniex...")
 }

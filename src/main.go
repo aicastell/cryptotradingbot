@@ -43,6 +43,9 @@ func main() {
 		os.Exit(1)
 	}
 
+	// Create fetcher
+	(*infetch).Create()
+
 	// Configure input fetcher
 	(*infetch).SetConfig(&cfg)
 
@@ -59,6 +62,9 @@ func main() {
 		fmt.Println("Unknown strategy")
 		os.Exit(1)
 	}
+
+	// Destroy Fetcher
+	(*infetch).Destroy()
 
 	os.Exit(0)
 }

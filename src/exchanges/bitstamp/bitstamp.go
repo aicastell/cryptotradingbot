@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 	"utils"
 )
 
@@ -36,12 +37,18 @@ type TBitstampTicker struct {
 	Open      string `json:"open"`
 }
 
+func (ob *TBitstamp) Create() {
+	fmt.Println("Initializing Bitstamp Input...")
+}
+
 func (ob *TBitstamp) SetConfig(cfg *config.TBotConfig) {
 	ob.Config = cfg
 }
 
 func (ob *TBitstamp) GetPrice(coinpair string) (float64, error) {
 	fmt.Println("GetPrice en bitstamp")
+
+	time.Sleep(time.Duration(ob.Config.Global.Period) * time.Second)
 
 	// Build the URL
 	url := fmt.Sprintf("https://www.bitstamp.net/api/v2/ticker/%s/", coinpair)
@@ -104,4 +111,8 @@ func (ob *TBitstamp) GetPrice(coinpair string) (float64, error) {
 			}*/
 
 	return price, nil
+}
+
+func (ob *TBitstamp) Destroy() {
+	fmt.Println("Destroying Bitstamp...")
 }
