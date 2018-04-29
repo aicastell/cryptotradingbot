@@ -19,12 +19,14 @@ type TStrag01 struct{}
 
 func (ob *TStrag01) Start(cfg *config.TBotConfig, input *fetcher.TFetcher) {
 
+	fmt.Println("Starting: ", cfg.Strat01.Name)
+
 	var ema_fast ema.TFinantial_EMA
 	var ema_slow ema.TFinantial_EMA
 	var ema_vol ema.TFinantial_EMA
 
-	ema_fast.Reset(cfg.EMA.Fast)
-	ema_slow.Reset(cfg.EMA.Slow)
+	ema_fast.Reset(cfg.Strat01.EMA.Fast)
+	ema_slow.Reset(cfg.Strat01.EMA.Slow)
 	ema_vol.Reset(10)
 
 	var mm market.TMarket

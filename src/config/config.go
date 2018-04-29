@@ -4,25 +4,41 @@ package config
 {
     "global": {
         "strategy": "strategy02",
-        "fetcher": "poloniex",
+        "fetcher": "datafile",
         "buycoin": "btc",
         "sellcoin": "eur",
         "invest": 1000,
         "fee": 0.25,
-        "period": 60,
+        "period": 0,
         "training_iters": 90
     },
-    "ema": {
-        "fast": 13,
-        "slow": 34
+    "strategy01": {
+        "name": "Pure EMA",
+        "ema": {
+            "fast": 11,
+            "slow": 24
+        }
     },
-    "rsi": {
-        "win_len": 14,
-        "buy_level": 40,
-        "sell_level": 60
+    "strategy02": {
+        "name": "Ema + RSI",
+        "ema": {
+            "fast": 11,
+            "slow": 24
+        },
+        "rsi": {
+            "win_len": 14,
+            "buy_level": 40.0,
+            "sell_level": 60.0
+        }
+    },
+    "strategy03": {
+        "name": "Pure MACD",
+        "ema": {
+            "fast": 11,
+            "slow": 24
+        }
     }
 }
-
 */
 
 import (
@@ -54,10 +70,28 @@ type TConfig_RSI struct {
 	SellLevel float64 `json:"sell_level"`
 }
 
+type TConfig_Strat01 struct {
+	Name string      `json:"name"`
+	EMA  TConfig_EMA `json:"ema"`
+}
+
+type TConfig_Strat02 struct {
+	Name string      `json:"name"`
+	EMA  TConfig_EMA `json:"ema"`
+	RSI  TConfig_RSI `json:"rsi"`
+}
+
+type TConfig_Strat03 struct {
+	Name string      `json:"name"`
+	EMA  TConfig_EMA `json:"ema"`
+	// TODO
+}
+
 type TBotConfig struct {
-	Global TConfig_Global `json:"global"`
-	EMA    TConfig_EMA    `json:"ema"`
-	RSI    TConfig_RSI    `json:"rsi"`
+	Global  TConfig_Global  `json:"global"`
+	Strat01 TConfig_Strat01 `json:"strategy01"`
+	Strat02 TConfig_Strat02 `json:"strategy02"`
+	Strat03 TConfig_Strat03 `json:"strategy03"`
 }
 
 func (gconf *TBotConfig) LoadConfig() {
@@ -80,7 +114,7 @@ func (gconf *TBotConfig) LoadConfig() {
 
 func (gconf *TBotConfig) Log() {
 	fmt.Println("**********************************")
-	fmt.Println("Configuration summary:")
+	fmt.Println("Global configuration:")
 	fmt.Println("**********************************")
 	fmt.Println("Strategy:\t", gconf.Global.Strategy)
 	fmt.Println("Fetcher:\t", gconf.Global.Fetcher)
@@ -91,13 +125,29 @@ func (gconf *TBotConfig) Log() {
 	fmt.Println("Period:\t\t", gconf.Global.Period)
 	fmt.Println("TrainingIters:\t", gconf.Global.TrainingIters)
 
-	fmt.Println("EMA Fast:\t", gconf.EMA.Fast)
-	fmt.Println("EMA Slow:\t", gconf.EMA.Slow)
-
-	fmt.Println("RSI WinLen:\t", gconf.RSI.WinLen)
-	fmt.Println("RSI BuyLevel:\t", gconf.RSI.BuyLevel)
-	fmt.Println("RSI SellLevel:\t", gconf.RSI.SellLevel)
 	fmt.Println("**********************************")
+	fmt.Println("Strategy01 summary:")
+	fmt.Println("**********************************")
+	fmt.Println("Strat01 name: \t", gconf.Strat01.Name)
+	fmt.Println("Strat01 ema fast: \t", gconf.Strat01.EMA.Fast)
+	fmt.Println("Strat01 ema slow: \t", gconf.Strat01.EMA.Slow)
+
+	fmt.Println("**********************************")
+	fmt.Println("Strategy02 summary:")
+	fmt.Println("**********************************")
+	fmt.Println("Strat02 name: \t", gconf.Strat02.Name)
+	fmt.Println("Strat02 ema fast: \t", gconf.Strat02.EMA.Fast)
+	fmt.Println("Strat02 ema slow: \t", gconf.Strat02.EMA.Slow)
+	fmt.Println("Strat02 rsi window len: \t", gconf.Strat02.RSI.WinLen)
+	fmt.Println("Strat02 rsi buy level: \t", gconf.Strat02.RSI.BuyLevel)
+	fmt.Println("Strat02 rsi sell level: \t", gconf.Strat02.RSI.SellLevel)
+
+	fmt.Println("**********************************")
+	fmt.Println("Strategy03 summary:")
+	fmt.Println("**********************************")
+	fmt.Println("Strat03 name: \t", gconf.Strat03.Name)
+	fmt.Println("Strat03 ema fast: \t", gconf.Strat03.EMA.Fast)
+	fmt.Println("Strat03 ema slow: \t", gconf.Strat03.EMA.Slow)
 }
 
 /*
